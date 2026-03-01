@@ -17,6 +17,10 @@ test:
   pnpm test
   pnpm build
 
+# Seed the database with development fixtures
+seed:
+  pnpm --filter @repo/db run seed
+
 # Build the production Docker image
 build-image:
   docker build -t app -f apps/web/Dockerfile .
