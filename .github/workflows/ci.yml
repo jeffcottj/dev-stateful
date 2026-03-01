@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    name: Lint / Typecheck / Test / Build / Smoke
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      APP_URL: http://localhost:3000
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
+      REDIS_URL: redis://localhost:6379
+      AUTH_ENABLED: "false"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run migrations
+        run: pnpm --filter @repo/db run db:migrate
+
+      - name: Smoke test — start server and hit /api/health
+        run: |
+          NODE_ENV=production pnpm --filter @repo/web start &
+          SERVER_PID=$!
+
+          echo "Waiting for server to be ready..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+              echo "Server is ready after ${i} attempts"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Server did not become ready in time"
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          HEALTH=$(curl -sf http://localhost:3000/api/health)
+          echo "Health response: $HEALTH"
+
+          STATUS=$(echo "$HEALTH" | jq -r '.status')
+          DB_OK=$(echo "$HEALTH" | jq -r '.db.ok')
+          REDIS_OK=$(echo "$HEALTH" | jq -r '.redis.ok')
+
+          kill $SERVER_PID 2>/dev/null || true
+
+          if [ "$STATUS" != "ok" ] || [ "$DB_OK" != "true" ] || [ "$REDIS_OK" != "true" ]; then
+            echo "Smoke test FAILED: status=$STATUS db.ok=$DB_OK redis.ok=$REDIS_OK"
+            exit 1
+          fi
+
+          echo "Smoke test PASSED"
