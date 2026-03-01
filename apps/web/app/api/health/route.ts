@@ -2,9 +2,17 @@ import { NextResponse } from 'next/server';
 import { db, appMeta } from '@repo/db';
 import { eq } from 'drizzle-orm';
 import { createClient } from '@redis/client';
-import { config } from '@repo/config';
+import { config, type ApiResponse } from '@repo/config';
 
 export const dynamic = 'force-dynamic';
+
+type HealthData = {
+  status: 'ok' | 'degraded';
+  version: string;
+  db: { ok: boolean; latencyMs?: number };
+  redis: { ok: boolean; latencyMs?: number };
+  time: string;
+};
 
 export async function GET() {
   const time = new Date().toISOString();
@@ -40,14 +48,16 @@ export async function GET() {
 
   const status = dbOk && redisOk ? 'ok' : 'degraded';
 
-  return NextResponse.json(
-    {
+  const body: ApiResponse<HealthData> = {
+    ok: true,
+    data: {
       status,
       version,
       db: { ok: dbOk, latencyMs: dbLatencyMs },
       redis: { ok: redisOk, latencyMs: redisLatencyMs },
       time,
     },
-    { status: status === 'ok' ? 200 : 503 }
-  );
+  };
+
+  return NextResponse.json(body, { status: status === 'ok' ? 200 : 503 });
 }

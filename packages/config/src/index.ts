@@ -14,18 +14,24 @@ const envSchema = z
       .transform((v) => v === 'true')
       .default('false'),
 
-    OIDC_ISSUER: z.string().optional(),
-    OIDC_CLIENT_ID: z.string().optional(),
-    OIDC_CLIENT_SECRET: z.string().optional(),
-    OIDC_CALLBACK_URL: z.string().optional(),
+    NEXTAUTH_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string().min(32),
+
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+
+    ENTRA_CLIENT_ID: z.string().optional(),
+    ENTRA_CLIENT_SECRET: z.string().optional(),
+    ENTRA_TENANT_ID: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.AUTH_ENABLED) {
       const required = [
-        ['OIDC_ISSUER', data.OIDC_ISSUER],
-        ['OIDC_CLIENT_ID', data.OIDC_CLIENT_ID],
-        ['OIDC_CLIENT_SECRET', data.OIDC_CLIENT_SECRET],
-        ['OIDC_CALLBACK_URL', data.OIDC_CALLBACK_URL],
+        ['GOOGLE_CLIENT_ID', data.GOOGLE_CLIENT_ID],
+        ['GOOGLE_CLIENT_SECRET', data.GOOGLE_CLIENT_SECRET],
+        ['ENTRA_CLIENT_ID', data.ENTRA_CLIENT_ID],
+        ['ENTRA_CLIENT_SECRET', data.ENTRA_CLIENT_SECRET],
+        ['ENTRA_TENANT_ID', data.ENTRA_TENANT_ID],
       ] as const;
 
       for (const [key, val] of required) {
@@ -51,3 +57,5 @@ if (!result.success) {
 
 export const config = result.data;
 export type Config = typeof config;
+
+export * from './types';
