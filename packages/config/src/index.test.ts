@@ -11,6 +11,12 @@ describe('@repo/config', () => {
     vi.stubEnv('AUTH_ENABLED', 'false');
     vi.stubEnv('NEXTAUTH_URL', 'http://localhost:3000');
     vi.stubEnv('NEXTAUTH_SECRET', 'a-secret-value-that-is-at-least-32-chars-long');
+    // Clear provider vars so tests are isolated from any ambient CI environment
+    vi.stubEnv('GOOGLE_CLIENT_ID', '');
+    vi.stubEnv('GOOGLE_CLIENT_SECRET', '');
+    vi.stubEnv('ENTRA_CLIENT_ID', '');
+    vi.stubEnv('ENTRA_CLIENT_SECRET', '');
+    vi.stubEnv('ENTRA_TENANT_ID', '');
   });
 
   afterEach(() => {
