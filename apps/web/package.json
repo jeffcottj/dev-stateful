@@ -9,11 +9,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@redis/client": "^1.6.0",
+    "@redis/client": "^5.11.0",
     "@repo/config": "workspace:*",
     "@repo/db": "workspace:*",
-    "drizzle-orm": "^0.40.1",
-    "next": "^15.2.0",
+    "drizzle-orm": "^0.45.1",
+    "next": "^16.1.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
