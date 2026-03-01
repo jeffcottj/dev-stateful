@@ -19,8 +19,8 @@ Purpose: establish a generic, repeatable foundation for **any** stateful web app
 
 - [ ] Language: TypeScript (app + tooling)
 - [ ] Framework: Next.js (App Router)
-- [ ] Runtime: Node.js (pin major version, ideally exact)
-- [ ] Package manager: pick one and enforce (pnpm recommended)
+- [ ] Runtime: Node.js (pin v24 LTS)
+- [ ] Package manager: pnpm
 - [ ] Database: PostgreSQL
 - [ ] Redis included as a compose service (recommended even if unused)
 - [ ] Docker is the default dev path (dependencies at minimum)
