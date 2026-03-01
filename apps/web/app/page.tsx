@@ -4,6 +4,9 @@ import { db, appMeta } from '@repo/db';
 import { eq } from 'drizzle-orm';
 import { createClient } from '@redis/client';
 import { config } from '@repo/config';
+import { Nav } from '@/components/nav';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 async function getStatus() {
   let dbOk = false;
@@ -34,27 +37,46 @@ export default async function HomePage() {
   const { dbOk, redisOk } = await getStatus();
 
   return (
-    <main style={{ fontFamily: 'monospace', padding: '2rem' }}>
-      <h1>Template running</h1>
-      <table>
-        <tbody>
-          <tr>
-            <td>Environment</td>
-            <td>{process.env.NODE_ENV}</td>
-          </tr>
-          <tr>
-            <td>Database</td>
-            <td>{dbOk ? 'ok' : 'degraded'}</td>
-          </tr>
-          <tr>
-            <td>Redis</td>
-            <td>{redisOk ? 'ok' : 'degraded'}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p>
-        <a href="/api/health">/api/health</a>
-      </p>
-    </main>
+    <>
+      <Nav />
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-semibold mb-6">Template running</h1>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Environment
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Badge variant="outline">{process.env.NODE_ENV}</Badge>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Database</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Badge variant={dbOk ? 'default' : 'destructive'}>{dbOk ? 'ok' : 'degraded'}</Badge>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Redis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Badge variant={redisOk ? 'default' : 'destructive'}>
+                {redisOk ? 'ok' : 'degraded'}
+              </Badge>
+            </CardContent>
+          </Card>
+        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          <a href="/api/health" className="underline hover:text-foreground">
+            /api/health
+          </a>
+        </p>
+      </main>
+    </>
   );
 }

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repo Is
 
-A stateful web application template being built incrementally. Step 0 (baseline setup) is implemented. Implementation follows the step docs in `docs/`.
+A stateful web application template being built incrementally. Step 0 (baseline setup) and Step 1 (auth, UI, deployment) are implemented. Implementation follows the step docs in `docs/`.
 
 ## Locked-In Decisions
 
@@ -36,6 +36,7 @@ No domain-specific models or business entities belong in the template layer.
 | Start dev (deps + migrations + app) | `just dev`                              |
 | Reset to clean state                | `just reset`                            |
 | Run all quality gates               | `just test`                             |
+| Build production Docker image       | `just build-image`                      |
 | Lint                                | `pnpm lint`                             |
 | Typecheck                           | `pnpm typecheck`                        |
 | Unit tests                          | `pnpm test`                             |
@@ -56,4 +57,4 @@ The golden-path order is non-negotiable: bring up compose → run migrations →
 
 ## Step Docs
 
-Implementation decisions, acceptance criteria, and checklists for each phase live in `docs/`. Read the relevant step doc before implementing a phase. Step 0 (`docs/step-0.md`) must be fully complete before moving on.
+Implementation decisions, acceptance criteria, and checklists for each phase live in `docs/`. Read the relevant step doc before implementing a phase. Step 0 (`docs/step-0.md`) and Step 1 (`docs/step-1.md`) are complete.

@@ -41,7 +41,14 @@ jobs:
       LOG_LEVEL: info
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
       REDIS_URL: redis://localhost:6379
-      AUTH_ENABLED: "false"
+      AUTH_ENABLED: "true"
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: supersecretvaluethatisatleast32chars1234
+      GOOGLE_CLIENT_ID: dummy-google-client-id
+      GOOGLE_CLIENT_SECRET: dummy-google-client-secret
+      ENTRA_CLIENT_ID: dummy-entra-client-id
+      ENTRA_CLIENT_SECRET: dummy-entra-client-secret
+      ENTRA_TENANT_ID: common
 
     steps:
       - name: Checkout
@@ -96,14 +103,15 @@ jobs:
           HEALTH=$(curl -sf http://localhost:3000/api/health)
           echo "Health response: $HEALTH"
 
-          STATUS=$(echo "$HEALTH" | jq -r '.status')
-          DB_OK=$(echo "$HEALTH" | jq -r '.db.ok')
-          REDIS_OK=$(echo "$HEALTH" | jq -r '.redis.ok')
+          OK=$(echo "$HEALTH" | jq -r '.ok')
+          STATUS=$(echo "$HEALTH" | jq -r '.data.status')
+          DB_OK=$(echo "$HEALTH" | jq -r '.data.db.ok')
+          REDIS_OK=$(echo "$HEALTH" | jq -r '.data.redis.ok')
 
           kill $SERVER_PID 2>/dev/null || true
 
-          if [ "$STATUS" != "ok" ] || [ "$DB_OK" != "true" ] || [ "$REDIS_OK" != "true" ]; then
-            echo "Smoke test FAILED: status=$STATUS db.ok=$DB_OK redis.ok=$REDIS_OK"
+          if [ "$OK" != "true" ] || [ "$STATUS" != "ok" ] || [ "$DB_OK" != "true" ] || [ "$REDIS_OK" != "true" ]; then
+            echo "Smoke test FAILED: ok=$OK status=$STATUS db.ok=$DB_OK redis.ok=$REDIS_OK"
             exit 1
           fi
 

@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: 'dev-stateful',
@@ -8,7 +10,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="bg-background text-foreground min-h-screen">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

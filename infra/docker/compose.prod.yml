@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file: .env
+    volumes:
+      - pg_data_prod:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+  app:
+    image: app
+    ports:
+      - "3000:3000"
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  pg_data_prod:

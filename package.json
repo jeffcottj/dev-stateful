@@ -11,6 +11,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "@tailwindcss/oxide",
       "esbuild",
       "lefthook",
       "sharp",
@@ -29,5 +30,8 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.26.0",
     "vitest": "^3.0.8"
+  },
+  "dependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "4.2.1"
   }
 }
